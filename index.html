@@ -230,6 +230,24 @@ if (arbeitstagStunden > 6 && arbeitstagStunden <= 9) {
 let gesamtMinuten = sollArbeitszeitMin + pauseMin;
 
 let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
+    // +15 Minuten Überstunden
+let plus15 = new Date(sollEnde.getTime() + 15 * 60000);
+
+// 10 Stunden Arbeitszeit Grenze
+let zehnStundenArbeitszeit = 10 * 60;
+
+// Pause auch hier berücksichtigen
+let pauseBei10h = 0;
+
+if (zehnStundenArbeitszeit > 6 * 60 && zehnStundenArbeitszeit <= 9 * 60) {
+    pauseBei10h = 30;
+} else if (zehnStundenArbeitszeit > 9 * 60) {
+    pauseBei10h = 45;
+}
+
+let zehnStundenZeit = new Date(
+    start.getTime() + (zehnStundenArbeitszeit + pauseBei10h) * 60000
+);
 
     let sollH = sollEnde.getHours().toString().padStart(2,"0");
     let sollM = sollEnde.getMinutes().toString().padStart(2,"0");
@@ -237,6 +255,19 @@ let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
     let ergebnis = `
         Du hast um ${startInput} begonnen.<br><br>
         Soll-Feierabend: ${sollH}:${sollM}<br>
+        let plus15H = plus15.getHours().toString().padStart(2,"0");
+let plus15M = plus15.getMinutes().toString().padStart(2,"0");
+
+let zehnH = zehnStundenZeit.getHours().toString().padStart(2,"0");
+let zehnM = zehnStundenZeit.getMinutes().toString().padStart(2,"0");
+
+ergebnis += `
+<br>+15 Minuten: ${plus15H}:${plus15M}
+<br>10 Stunden Grenze: ${zehnH}:${zehnM}
+<br><br>
+
+;
+    
     `;
 
     if (endInput) {
@@ -288,5 +319,6 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
+
 
 
