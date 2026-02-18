@@ -218,7 +218,18 @@ function berechnen() {
     let arbeitstagStunden = wochenStunden / 5;
     let sollArbeitszeitMin = arbeitstagStunden * 60;
 
-    let sollEnde = new Date(start.getTime() + sollArbeitszeitMin * 60000);
+   let pauseMin = 0;
+
+// Gesetzliche Pause berücksichtigen
+if (arbeitstagStunden > 6 && arbeitstagStunden <= 9) {
+    pauseMin = 30;
+} else if (arbeitstagStunden > 9) {
+    pauseMin = 45;
+}
+
+let gesamtMinuten = sollArbeitszeitMin + pauseMin;
+
+let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
 
     let sollH = sollEnde.getHours().toString().padStart(2,"0");
     let sollM = sollEnde.getMinutes().toString().padStart(2,"0");
@@ -277,4 +288,5 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
+
 
