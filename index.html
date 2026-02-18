@@ -13,9 +13,9 @@
 <style>
 body {
     display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     font-family: Arial, sans-serif;
     background: #121212;
     color: white;
@@ -24,7 +24,7 @@ height: 100vh;
 
 .container {
     max-width: 450px;
-    margin: auto;
+    width: 100%;
 }
 
 h2 {
@@ -59,7 +59,6 @@ input {
     font-size: 16px;
     background: #2a2a2a;
     color: white;
-    margin-bottom: 15px;
 }
 
 button {
@@ -85,15 +84,17 @@ button:hover {
     font-size: 16px;
     line-height: 1.6;
 }
-    .countdown {
+
+/* Countdown */
+.countdown {
     margin-top: 15px;
     font-size: 22px;
     font-weight: bold;
     text-align: center;
     color: #4CAF50;
-    transition: all 0.3s ease;
 }
 
+/* Animation */
 .animate-result {
     animation: pop 0.4s ease;
 }
@@ -102,17 +103,6 @@ button:hover {
     0% { transform: scale(0.8); opacity: 0; }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); opacity: 1; }
-}
-
-.animate-result {
-    animation: pop 0.4s ease;
-}
-
-@keyframes pop {
-    0% { transform: scale(0.8); opacity: 0; }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); opacity: 1; }
-}
 }
 </style>
 </head>
@@ -132,15 +122,16 @@ button:hover {
         <button onclick="berechnen()">Berechnen</button>
     </div>
 
-   <div class="result-box" id="output">
-    Hier erscheint dein Ergebnis
-</div>
+    <div class="result-box" id="output">
+        Hier erscheint dein Ergebnis
+    </div>
 
-<div id="countdown" class="countdown"></div>
+    <div id="countdown" class="countdown"></div>
 </div>
 
 <script>
-    let countdownInterval;
+
+let countdownInterval;
 
 function startCountdown(targetTime) {
 
@@ -171,6 +162,7 @@ function startCountdown(targetTime) {
 
     }, 1000);
 }
+
 function berechnen() {
 
     let startInput = document.getElementById("startTime").value;
@@ -202,10 +194,6 @@ function berechnen() {
         diffStunden.toString().padStart(2, "0") + ":" +
         diffMinuten.toString().padStart(2, "0");
 
-    let extraPauseZeit = new Date(start.getTime() + (9 * 60) * 60000);
-    let extraH = extraPauseZeit.getHours().toString().padStart(2, "0");
-    let extraM = extraPauseZeit.getMinutes().toString().padStart(2, "0");
-
     let sollH = sollEnde.getHours().toString().padStart(2,"0");
     let sollM = sollEnde.getMinutes().toString().padStart(2,"0");
 
@@ -213,7 +201,6 @@ function berechnen() {
         Du hast um ${startInput} begonnen.<br><br>
         Soll-Feierabend: ${sollH}:${sollM}<br>
         Tatsächlicher Feierabend: ${endInput}<br><br>
-        Extra 15 Min Pause ab: ${extraH}:${extraM}<br><br>
     `;
 
     if (differenzMin > 0) {
@@ -225,24 +212,22 @@ function berechnen() {
     }
 
     document.getElementById("output").innerHTML = ergebnis;
-    startCountdown(endInput);
 
-let box = document.getElementById("output");
-box.classList.remove("animate-result");
-void box.offsetWidth;
-box.classList.add("animate-result");
+    // Animation
+    let box = document.getElementById("output");
+    box.classList.remove("animate-result");
+    void box.offsetWidth;
+    box.classList.add("animate-result");
+
+    // Countdown starten
+    startCountdown(endInput);
 }
-   
-</script>
-<script>
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
 }
+
 </script>
+
 </body>
-
 </html>
-
-
-
-
