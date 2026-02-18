@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Arbeitszeitrechner</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Arbeitszeitrechner">
+
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#121212">
@@ -74,7 +79,6 @@ button:hover {
     opacity: 0.9;
 }
 
-/* Wochenstunden Buttons */
 .stunden-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -91,7 +95,6 @@ button:hover {
     background: #4CAF50;
 }
 
-/* Ergebnis */
 .result-box {
     margin-top: 20px;
     padding: 20px;
@@ -101,7 +104,6 @@ button:hover {
     line-height: 1.6;
 }
 
-/* Countdown */
 .countdown {
     margin-top: 15px;
     font-size: 22px;
@@ -110,7 +112,6 @@ button:hover {
     color: #4CAF50;
 }
 
-/* Animation */
 .animate-result {
     animation: pop 0.4s ease;
 }
@@ -119,6 +120,14 @@ button:hover {
     0% { transform: scale(0.85); opacity: 0; }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); opacity: 1; }
+}
+
+.highlight {
+    color: #FFD54F;
+}
+
+.warning {
+    color: #FF5252;
 }
 
 </style>
@@ -153,7 +162,6 @@ button:hover {
     </div>
 
     <div id="countdown" class="countdown"></div>
-
 </div>
 
 <script>
@@ -163,15 +171,21 @@ let countdownInterval;
 
 function setWoche(stunden, element) {
     wochenStunden = stunden;
-
     document.querySelectorAll(".stunden-buttons button")
         .forEach(btn => btn.classList.remove("active"));
-
     element.classList.add("active");
 }
 
-function startCountdown(targetTime) {
+function berechnePause(arbeitsMinuten) {
+    if (arbeitsMinuten > 6 * 60 && arbeitsMinuten <= 9 * 60) {
+        return 30;
+    } else if (arbeitsMinuten > 9 * 60) {
+        return 45;
+    }
+    return 0;
+}
 
+function startCountdown(targetTime) {
     clearInterval(countdownInterval);
 
     const [hours, minutes] = targetTime.split(":");
@@ -211,69 +225,37 @@ function berechnen() {
     }
 
     let [startH, startM] = startInput.split(":").map(Number);
-
     let start = new Date();
     start.setHours(startH, startM, 0);
 
     let arbeitstagStunden = wochenStunden / 5;
-    let sollArbeitszeitMin = arbeitstagStunden * 60;
+    let arbeitsMinuten = arbeitstagStunden * 60;
 
-   let pauseMin = 0;
+    let pause = berechnePause(arbeitsMinuten);
+    let gesamtMinuten = arbeitsMinuten + pause;
 
-// Gesetzliche Pause berücksichtigen
-if (arbeitstagStunden > 6 && arbeitstagStunden <= 9) {
-    pauseMin = 30;
-} else if (arbeitstagStunden > 9) {
-    pauseMin = 45;
-}
+    let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
+    let plus15 = new Date(sollEnde.getTime() + 15 * 60000);
 
-let gesamtMinuten = sollArbeitszeitMin + pauseMin;
+    // 10 Stunden Grenze (reine Arbeitszeit!)
+    let pauseBei10h = berechnePause(10 * 60);
+    let zehnStundenZeit = new Date(start.getTime() + (10 * 60 + pauseBei10h) * 60000);
 
-let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
-    // +15 Minuten Überstunden
-let plus15 = new Date(sollEnde.getTime() + 15 * 60000);
-
-// 10 Stunden Arbeitszeit Grenze
-let zehnStundenArbeitszeit = 10 * 60;
-
-// Pause auch hier berücksichtigen
-let pauseBei10h = 0;
-
-if (zehnStundenArbeitszeit > 6 * 60 && zehnStundenArbeitszeit <= 9 * 60) {
-    pauseBei10h = 30;
-} else if (zehnStundenArbeitszeit > 9 * 60) {
-    pauseBei10h = 45;
-}
-
-let zehnStundenZeit = new Date(
-    start.getTime() + (zehnStundenArbeitszeit + pauseBei10h) * 60000
-);
-
-    let sollH = sollEnde.getHours().toString().padStart(2,"0");
-    let sollM = sollEnde.getMinutes().toString().padStart(2,"0");
+    function formatTime(date) {
+        return date.getHours().toString().padStart(2,"0") + ":" +
+               date.getMinutes().toString().padStart(2,"0");
+    }
 
     let ergebnis = `
         Du hast um ${startInput} begonnen.<br><br>
-        Soll-Feierabend: ${sollH}:${sollM}<br>
-        let plus15H = plus15.getHours().toString().padStart(2,"0");
-let plus15M = plus15.getMinutes().toString().padStart(2,"0");
-
-let zehnH = zehnStundenZeit.getHours().toString().padStart(2,"0");
-let zehnM = zehnStundenZeit.getMinutes().toString().padStart(2,"0");
-
-ergebnis += `
-<br>+15 Minuten: ${plus15H}:${plus15M}
-<br>10 Stunden Grenze: ${zehnH}:${zehnM}
-<br><br>
-
-;
-    
+        Soll-Feierabend: <b>${formatTime(sollEnde)}</b><br>
+        <span class="highlight">+15 Minuten:</span> ${formatTime(plus15)}<br>
+        <span class="warning">10 Stunden Grenze:</span> ${formatTime(zehnStundenZeit)}<br><br>
     `;
 
     if (endInput) {
 
         let [endH, endM] = endInput.split(":").map(Number);
-
         let end = new Date();
         end.setHours(endH, endM, 0);
 
@@ -300,7 +282,6 @@ ergebnis += `
 
     } else {
         document.getElementById("countdown").textContent = "";
-        ergebnis += `<br>Du musst heute ${arbeitstagStunden.toFixed(2)} Stunden arbeiten.`;
     }
 
     document.getElementById("output").innerHTML = ergebnis;
@@ -319,6 +300,4 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
-
-
 
