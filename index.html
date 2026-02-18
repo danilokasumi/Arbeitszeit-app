@@ -84,6 +84,7 @@ button:hover {
     border-radius: 12px;
     font-size: 16px;
     line-height: 1.6;
+}
     .countdown {
     margin-top: 15px;
     font-size: 22px;
@@ -91,6 +92,16 @@ button:hover {
     text-align: center;
     color: #4CAF50;
     transition: all 0.3s ease;
+}
+
+.animate-result {
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .animate-result {
@@ -121,13 +132,45 @@ button:hover {
         <button onclick="berechnen()">Berechnen</button>
     </div>
 
-    <div class="result-box" id="output">
-        Hier erscheint dein Ergebnis
-        <div id="countdown" class="countdown"></div>
-    </div>
+   <div class="result-box" id="output">
+    Hier erscheint dein Ergebnis
+</div>
+
+<div id="countdown" class="countdown"></div>
 </div>
 
 <script>
+    let countdownInterval;
+
+function startCountdown(targetTime) {
+
+    clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+
+        const now = new Date();
+        const target = new Date();
+
+        const [hours, minutes] = targetTime.split(":");
+        target.setHours(hours, minutes, 0, 0);
+
+        const diff = target - now;
+
+        if (diff <= 0) {
+            document.getElementById("countdown").textContent = "Feierabend 🎉";
+            clearInterval(countdownInterval);
+            return;
+        }
+
+        const h = Math.floor(diff / (1000 * 60 * 60));
+        const m = Math.floor((diff / (1000 * 60)) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        document.getElementById("countdown").textContent =
+            `Countdown: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+    }, 1000);
+}
 function berechnen() {
 
     let startInput = document.getElementById("startTime").value;
@@ -182,7 +225,14 @@ function berechnen() {
     }
 
     document.getElementById("output").innerHTML = ergebnis;
+    startCountdown(endInput);
+
+let box = document.getElementById("output");
+box.classList.remove("animate-result");
+void box.offsetWidth;
+box.classList.add("animate-result");
 }
+   
 </script>
 <script>
 if ('serviceWorker' in navigator) {
@@ -192,6 +242,7 @@ if ('serviceWorker' in navigator) {
 </body>
 
 </html>
+
 
 
 
