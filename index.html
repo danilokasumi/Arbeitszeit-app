@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arbeitszeit App</title>
+<title>Arbeitszeitrechner</title>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#121212">
 
 <style>
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     font-family: Arial, sans-serif;
     background: #121212;
     color: white;
-    padding: 30px;
+    padding: 20px;
 }
 
 .container {
@@ -29,7 +28,7 @@ body {
 
 h2 {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .section {
@@ -41,16 +40,15 @@ h2 {
 
 label {
     display: block;
-    margin-top: 15px;
     text-align: center;
-    margin-bottom: 6px;
+    margin: 15px 0 5px;
     font-size: 14px;
     color: #bbbbbb;
 }
 
 input {
-    width: 120px;
-    padding: 6px;
+    width: 130px;
+    padding: 8px;
     text-align: center;
     display: block;
     margin: 8px auto;
@@ -76,6 +74,24 @@ button:hover {
     opacity: 0.9;
 }
 
+/* Wochenstunden Buttons */
+.stunden-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.stunden-buttons button {
+    background: #2a2a2a;
+    border: 1px solid #444;
+}
+
+.stunden-buttons button.active {
+    background: #4CAF50;
+}
+
+/* Ergebnis */
 .result-box {
     margin-top: 20px;
     padding: 20px;
@@ -100,23 +116,33 @@ button:hover {
 }
 
 @keyframes pop {
-    0% { transform: scale(0.8); opacity: 0; }
+    0% { transform: scale(0.85); opacity: 0; }
     50% { transform: scale(1.05); }
     100% { transform: scale(1); opacity: 1; }
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="container">
-    <h2>Arbeitszeit Rechner</h2>
+    <h2>Arbeitszeitrechner</h2>
 
     <div class="section">
+
+        <label>Wochenarbeitszeit</label>
+        <div class="stunden-buttons">
+            <button type="button" onclick="setWoche(40, this)" class="active">40 Std</button>
+            <button type="button" onclick="setWoche(39, this)">39 Std</button>
+            <button type="button" onclick="setWoche(38, this)">38 Std</button>
+            <button type="button" onclick="setWoche(37.5, this)">37.5 Std</button>
+        </div>
+
         <label>Startzeit</label>
         <input type="time" id="startTime">
 
-        <label>Tatsächlicher Feierabend</label>
+        <label>Tatsächlicher Feierabend (optional)</label>
         <input type="time" id="endTime">
 
         <button onclick="berechnen()">Berechnen</button>
@@ -127,22 +153,33 @@ button:hover {
     </div>
 
     <div id="countdown" class="countdown"></div>
+
 </div>
 
 <script>
 
+let wochenStunden = 40;
 let countdownInterval;
+
+function setWoche(stunden, element) {
+    wochenStunden = stunden;
+
+    document.querySelectorAll(".stunden-buttons button")
+        .forEach(btn => btn.classList.remove("active"));
+
+    element.classList.add("active");
+}
 
 function startCountdown(targetTime) {
 
     clearInterval(countdownInterval);
 
+    const [hours, minutes] = targetTime.split(":");
+
     countdownInterval = setInterval(() => {
 
         const now = new Date();
         const target = new Date();
-
-        const [hours, minutes] = targetTime.split(":");
         target.setHours(hours, minutes, 0, 0);
 
         const diff = target - now;
@@ -168,31 +205,20 @@ function berechnen() {
     let startInput = document.getElementById("startTime").value;
     let endInput = document.getElementById("endTime").value;
 
-    if (!startInput || !endInput) {
-        alert("Bitte Start- und Feierabendzeit eingeben");
+    if (!startInput) {
+        alert("Bitte Startzeit eingeben");
         return;
     }
 
     let [startH, startM] = startInput.split(":").map(Number);
-    let [endH, endM] = endInput.split(":").map(Number);
 
     let start = new Date();
     start.setHours(startH, startM, 0);
 
-    let end = new Date();
-    end.setHours(endH, endM, 0);
+    let arbeitstagStunden = wochenStunden / 5;
+    let sollArbeitszeitMin = arbeitstagStunden * 60;
 
-    let sollArbeitszeitMin = (8 * 60) + 30;
     let sollEnde = new Date(start.getTime() + sollArbeitszeitMin * 60000);
-
-    let differenzMin = Math.round((end - sollEnde) / 60000);
-
-    let diffStunden = Math.floor(Math.abs(differenzMin) / 60);
-    let diffMinuten = Math.abs(differenzMin) % 60;
-
-    let diffText = 
-        diffStunden.toString().padStart(2, "0") + ":" +
-        diffMinuten.toString().padStart(2, "0");
 
     let sollH = sollEnde.getHours().toString().padStart(2,"0");
     let sollM = sollEnde.getMinutes().toString().padStart(2,"0");
@@ -200,27 +226,47 @@ function berechnen() {
     let ergebnis = `
         Du hast um ${startInput} begonnen.<br><br>
         Soll-Feierabend: ${sollH}:${sollM}<br>
-        Tatsächlicher Feierabend: ${endInput}<br><br>
     `;
 
-    if (differenzMin > 0) {
-        ergebnis += `Überstunden: +${diffText}`;
-    } else if (differenzMin < 0) {
-        ergebnis += `Minusstunden: -${diffText}`;
+    if (endInput) {
+
+        let [endH, endM] = endInput.split(":").map(Number);
+
+        let end = new Date();
+        end.setHours(endH, endM, 0);
+
+        let differenzMin = Math.round((end - sollEnde) / 60000);
+
+        let diffStunden = Math.floor(Math.abs(differenzMin) / 60);
+        let diffMinuten = Math.abs(differenzMin) % 60;
+
+        let diffText =
+            diffStunden.toString().padStart(2,"0") + ":" +
+            diffMinuten.toString().padStart(2,"0");
+
+        ergebnis += `Tatsächlicher Feierabend: ${endInput}<br><br>`;
+
+        if (differenzMin > 0) {
+            ergebnis += `Überstunden: +${diffText}`;
+        } else if (differenzMin < 0) {
+            ergebnis += `Minusstunden: -${diffText}`;
+        } else {
+            ergebnis += `Perfekt auf 0 Stunden 🎯`;
+        }
+
+        startCountdown(endInput);
+
     } else {
-        ergebnis += `Perfekt auf 0 Stunden 🎯`;
+        document.getElementById("countdown").textContent = "";
+        ergebnis += `<br>Du musst heute ${arbeitstagStunden.toFixed(2)} Stunden arbeiten.`;
     }
 
     document.getElementById("output").innerHTML = ergebnis;
 
-    // Animation
     let box = document.getElementById("output");
     box.classList.remove("animate-result");
     void box.offsetWidth;
     box.classList.add("animate-result");
-
-    // Countdown starten
-    startCountdown(endInput);
 }
 
 if ('serviceWorker' in navigator) {
