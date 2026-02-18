@@ -185,18 +185,14 @@ function berechnePause(arbeitsMinuten) {
     return 0;
 }
 
-function startCountdown(targetTime) {
-    clearInterval(countdownInterval);
+function startCountdown(targetDate) {
 
-    const [hours, minutes] = targetTime.split(":");
+    clearInterval(countdownInterval);
 
     countdownInterval = setInterval(() => {
 
         const now = new Date();
-        const target = new Date();
-        target.setHours(hours, minutes, 0, 0);
-
-        const diff = target - now;
+        const diff = targetDate - now;
 
         if (diff <= 0) {
             document.getElementById("countdown").textContent = "Feierabend 🎉";
@@ -209,7 +205,7 @@ function startCountdown(targetTime) {
         const s = Math.floor((diff / 1000) % 60);
 
         document.getElementById("countdown").textContent =
-            `Countdown: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+            `Countdown bis Soll-Feierabend: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 
     }, 1000);
 }
@@ -237,7 +233,6 @@ function berechnen() {
     let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
     let plus15 = new Date(sollEnde.getTime() + 15 * 60000);
 
-    // 10 Stunden Grenze (reine Arbeitszeit!)
     let pauseBei10h = berechnePause(10 * 60);
     let zehnStundenZeit = new Date(start.getTime() + (10 * 60 + pauseBei10h) * 60000);
 
@@ -249,8 +244,8 @@ function berechnen() {
     let ergebnis = `
         Du hast um ${startInput} begonnen.<br><br>
         Soll-Feierabend: <b>${formatTime(sollEnde)}</b><br>
-        <span class="highlight">+15 Minuten:</span> ${formatTime(plus15)}<br>
-        <span class="warning">10 Stunden Grenze:</span> ${formatTime(zehnStundenZeit)}<br><br>
+        +15 Minuten: ${formatTime(plus15)}<br>
+        10 Stunden Grenze: ${formatTime(zehnStundenZeit)}<br><br>
     `;
 
     if (endInput) {
@@ -277,14 +272,12 @@ function berechnen() {
         } else {
             ergebnis += `Perfekt auf 0 Stunden 🎯`;
         }
-
-        startCountdown(endInput);
-
-    } else {
-        document.getElementById("countdown").textContent = "";
     }
 
     document.getElementById("output").innerHTML = ergebnis;
+
+    // 🔥 Countdown IMMER an Soll-Feierabend koppeln
+    startCountdown(sollEnde);
 
     let box = document.getElementById("output");
     box.classList.remove("animate-result");
@@ -300,4 +293,5 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
+
 
