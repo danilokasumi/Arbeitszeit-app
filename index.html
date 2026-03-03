@@ -14,154 +14,123 @@
 <meta name="theme-color" content="#121212">
 
 <style>
-
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background: #121212;
-    color: white;
-    padding: 20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    font-family:Arial;
+    background:#121212;
+    color:white;
+    padding:20px;
 }
-
-.container {
-    max-width: 450px;
-    width: 100%;
-}
-
-h2 {
-    text-align: center;
-    margin-bottom: 25px;
-}
+.container { max-width:450px; width:100%; }
+h2 { text-align:center; margin-bottom:25px; }
 
 .section {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    background:#1e1e1e;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
 }
 
 label {
-    display: block;
-    text-align: center;
-    margin: 15px 0 5px;
-    font-size: 14px;
-    color: #bbbbbb;
+    display:block;
+    text-align:center;
+    margin:15px 0 5px;
+    font-size:14px;
+    color:#bbb;
 }
 
 input {
-    width: 130px;
-    padding: 8px;
-    text-align: center;
-    display: block;
-    margin: 8px auto;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-    background: #2a2a2a;
-    color: white;
+    width:130px;
+    padding:8px;
+    text-align:center;
+    display:block;
+    margin:8px auto;
+    border-radius:8px;
+    border:none;
+    font-size:16px;
+    background:#2a2a2a;
+    color:white;
 }
 
 button {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    background: #4CAF50;
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: 0.9;
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
+    background:#4CAF50;
+    color:white;
+    cursor:pointer;
 }
 
 .stunden-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 10px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:10px;
 }
 
 .stunden-buttons button {
-    background: #2a2a2a;
-    border: 1px solid #444;
+    background:#2a2a2a;
+    border:1px solid #444;
 }
 
 .stunden-buttons button.active {
-    background: #4CAF50;
+    background:#4CAF50;
 }
 
 .result-box {
-    margin-top: 20px;
-    padding: 20px;
-    background: #1e1e1e;
-    border-radius: 12px;
-    font-size: 16px;
-    line-height: 1.6;
+    margin-top:20px;
+    padding:20px;
+    background:#1e1e1e;
+    border-radius:12px;
+    line-height:1.6;
 }
 
 .countdown {
-    margin-top: 15px;
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    color: #4CAF50;
+    margin-top:15px;
+    font-size:20px;
+    text-align:center;
+    color:#4CAF50;
 }
 
-.animate-result {
-    animation: pop 0.4s ease;
-}
-
-@keyframes pop {
-    0% { transform: scale(0.85); opacity: 0; }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.highlight {
-    color: #FFD54F;
-}
-
-.warning {
-    color: #FF5252;
-}
+.warn { color:#FFD54F; }
+.limit { color:#FF5252; }
 
 </style>
 </head>
-
 <body>
 
 <div class="container">
-    <h2>Arbeitszeitrechner</h2>
+<h2>Arbeitszeitrechner</h2>
 
-    <div class="section">
+<div class="section">
 
-        <label>Wochenarbeitszeit</label>
-        <div class="stunden-buttons">
-            <button type="button" onclick="setWoche(40, this)" class="active">40 Std</button>
-            <button type="button" onclick="setWoche(39, this)">39 Std</button>
-            <button type="button" onclick="setWoche(38, this)">38 Std</button>
-            <button type="button" onclick="setWoche(37.5, this)">37.5 Std</button>
-        </div>
+<label>Wochenarbeitszeit</label>
+<div class="stunden-buttons">
+<button type="button" onclick="setWoche(40,this)" class="active">40 Std</button>
+<button type="button" onclick="setWoche(39,this)">39 Std</button>
+<button type="button" onclick="setWoche(38,this)">38 Std</button>
+<button type="button" onclick="setWoche(37.5,this)">37.5 Std</button>
+</div>
 
-        <label>Startzeit</label>
-        <input type="time" id="startTime">
+<label>Startzeit</label>
+<input type="time" id="startTime">
 
-        <label>Tatsächlicher Feierabend (optional)</label>
-        <input type="time" id="endTime">
+<label>Tatsächlicher Feierabend (optional)</label>
+<input type="time" id="endTime">
 
-        <button onclick="berechnen()">Berechnen</button>
-    </div>
+<button onclick="berechnen()">Berechnen</button>
+</div>
 
-    <div class="result-box" id="output">
-        Hier erscheint dein Ergebnis
-    </div>
+<div id="output" class="result-box">
+Hier erscheint dein Ergebnis
+</div>
 
-    <div id="countdown" class="countdown"></div>
+<div id="countdown" class="countdown"></div>
 </div>
 
 <script>
@@ -169,129 +138,109 @@ button:hover {
 let wochenStunden = 40;
 let countdownInterval;
 
-function setWoche(stunden, element) {
+function setWoche(stunden, el){
     wochenStunden = stunden;
     document.querySelectorAll(".stunden-buttons button")
-        .forEach(btn => btn.classList.remove("active"));
-    element.classList.add("active");
+        .forEach(b=>b.classList.remove("active"));
+    el.classList.add("active");
 }
 
-function berechnePause(arbeitsMinuten) {
-    if (arbeitsMinuten > 6 * 60 && arbeitsMinuten <= 9 * 60) {
-        return 30;
-    } else if (arbeitsMinuten > 9 * 60) {
-        return 45;
-    }
+function formatTime(d){
+    return d.getHours().toString().padStart(2,"0")+":"+
+           d.getMinutes().toString().padStart(2,"0");
+}
+
+function pauseNachGesetz(nettoMin){
+    if(nettoMin > 9*60) return 45;
+    if(nettoMin > 6*60) return 30;
     return 0;
 }
 
-function startCountdown(targetDate) {
-
+function startCountdown(target){
     clearInterval(countdownInterval);
-
-    countdownInterval = setInterval(() => {
-
-        const now = new Date();
-        const diff = targetDate - now;
-
-        if (diff <= 0) {
-            document.getElementById("countdown").textContent = "Feierabend 🎉";
+    countdownInterval = setInterval(()=>{
+        let diff = target - new Date();
+        if(diff <= 0){
+            document.getElementById("countdown").textContent="Feierabend 🎉";
             clearInterval(countdownInterval);
             return;
         }
-
-        const h = Math.floor(diff / (1000 * 60 * 60));
-        const m = Math.floor((diff / (1000 * 60)) % 60);
-        const s = Math.floor((diff / 1000) % 60);
-
-        document.getElementById("countdown").textContent =
-            `Countdown bis Soll-Feierabend: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-
-    }, 1000);
+        let h=Math.floor(diff/1000/60/60);
+        let m=Math.floor(diff/1000/60)%60;
+        let s=Math.floor(diff/1000)%60;
+        document.getElementById("countdown").textContent=
+        `Countdown bis Soll-Feierabend: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    },1000);
 }
 
-function berechnen() {
+function berechnen(){
 
-    let startInput = document.getElementById("startTime").value;
-    let endInput = document.getElementById("endTime").value;
+let startInput=document.getElementById("startTime").value;
+let endInput=document.getElementById("endTime").value;
 
-    if (!startInput) {
-        alert("Bitte Startzeit eingeben");
-        return;
-    }
+if(!startInput){ alert("Bitte Startzeit eingeben"); return; }
 
-    let [startH, startM] = startInput.split(":").map(Number);
-    let start = new Date();
-    start.setHours(startH, startM, 0);
+let [sh,sm]=startInput.split(":").map(Number);
+let start=new Date();
+start.setHours(sh,sm,0);
 
-    let arbeitstagStunden = wochenStunden / 5;
-    let arbeitsMinuten = arbeitstagStunden * 60;
+let sollNettoMin=(wochenStunden/5)*60;
+let sollPause=pauseNachGesetz(sollNettoMin);
+let sollEnde=new Date(start.getTime()+(sollNettoMin+sollPause)*60000);
 
-    let pause = berechnePause(arbeitsMinuten);
-    let gesamtMinuten = arbeitsMinuten + pause;
+let plus15=new Date(sollEnde.getTime()+15*60000);
 
-    let sollEnde = new Date(start.getTime() + gesamtMinuten * 60000);
-    let plus15 = new Date(sollEnde.getTime() + 15 * 60000);
+// 10h Netto Grenze
+let pause10=pauseNachGesetz(10*60);
+let zehnGrenze=new Date(start.getTime()+(10*60+pause10)*60000);
 
-    let pauseBei10h = berechnePause(10 * 60);
-    let zehnStundenZeit = new Date(start.getTime() + (10 * 60 + pauseBei10h) * 60000);
+let output=`
+Du hast um ${startInput} begonnen.<br><br>
+Soll-Feierabend: <b>${formatTime(sollEnde)}</b><br>
++15 Minuten: ${formatTime(plus15)}<br>
+<span class="limit">10 Stunden Netto erreicht um:</span> ${formatTime(zehnGrenze)}<br><br>
+`;
 
-    function formatTime(date) {
-        return date.getHours().toString().padStart(2,"0") + ":" +
-               date.getMinutes().toString().padStart(2,"0");
-    }
+if(endInput){
 
-    let ergebnis = `
-        Du hast um ${startInput} begonnen.<br><br>
-        Soll-Feierabend: <b>${formatTime(sollEnde)}</b><br>
-        +15 Minuten: ${formatTime(plus15)}<br>
-        10 Stunden Grenze: ${formatTime(zehnStundenZeit)}<br><br>
-    `;
+let [eh,em]=endInput.split(":").map(Number);
+let end=new Date();
+end.setHours(eh,em,0);
 
-    if (endInput) {
+let bruttoMin=Math.round((end-start)/60000);
+let pause=pauseNachGesetz(bruttoMin);
+let nettoMin=bruttoMin-pause;
 
-        let [endH, endM] = endInput.split(":").map(Number);
-        let end = new Date();
-        end.setHours(endH, endM, 0);
-
-        let differenzMin = Math.round((end - sollEnde) / 60000);
-
-        let diffStunden = Math.floor(Math.abs(differenzMin) / 60);
-        let diffMinuten = Math.abs(differenzMin) % 60;
-
-        let diffText =
-            diffStunden.toString().padStart(2,"0") + ":" +
-            diffMinuten.toString().padStart(2,"0");
-
-        ergebnis += `Tatsächlicher Feierabend: ${endInput}<br><br>`;
-
-        if (differenzMin > 0) {
-            ergebnis += `Überstunden: +${diffText}`;
-        } else if (differenzMin < 0) {
-            ergebnis += `Minusstunden: -${diffText}`;
-        } else {
-            ergebnis += `Perfekt auf 0 Stunden 🎯`;
-        }
-    }
-
-    document.getElementById("output").innerHTML = ergebnis;
-
-    // 🔥 Countdown IMMER an Soll-Feierabend koppeln
-    startCountdown(sollEnde);
-
-    let box = document.getElementById("output");
-    box.classList.remove("animate-result");
-    void box.offsetWidth;
-    box.classList.add("animate-result");
+if(pause>0){
+output+=`<span class="warn">⚠ ${pause} Minuten Pause wurden automatisch abgezogen.</span><br><br>`;
 }
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
+let diff=nettoMin-sollNettoMin;
+let dh=Math.floor(Math.abs(diff)/60);
+let dm=Math.abs(diff)%60;
+let diffText=String(dh).padStart(2,"0")+":"+String(dm).padStart(2,"0");
+
+output+=`
+Tatsächlicher Feierabend: ${endInput}<br>
+Netto-Arbeitszeit: ${Math.floor(nettoMin/60)}h ${nettoMin%60}min<br><br>
+`;
+
+if(diff>0) output+=`Überstunden: +${diffText}`;
+else if(diff<0) output+=`Minusstunden: -${diffText}`;
+else output+=`Perfekt auf Sollzeit 🎯`;
+
+}
+
+document.getElementById("output").innerHTML=output;
+startCountdown(sollEnde);
+
+}
+
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('service-worker.js');
 }
 
 </script>
 
 </body>
 </html>
-
-
