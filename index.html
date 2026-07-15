@@ -1,246 +1,838 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arbeitszeitrechner</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arbeitszeitrechner</title>
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Arbeitszeitrechner">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Arbeitszeitrechner">
+  <meta name="theme-color" content="#121212">
 
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#121212">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
 
-<style>
-body {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    font-family:Arial;
-    background:#121212;
-    color:white;
-    padding:20px;
-}
-.container { max-width:450px; width:100%; }
-h2 { text-align:center; margin-bottom:25px; }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-.section {
-    background:#1e1e1e;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:20px;
-}
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 16px;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+    }
 
-label {
-    display:block;
-    text-align:center;
-    margin:15px 0 5px;
-    font-size:14px;
-    color:#bbb;
-}
+    .container {
+      max-width: 520px;
+      width: 100%;
+    }
 
-input {
-    width:130px;
-    padding:8px;
-    text-align:center;
-    display:block;
-    margin:8px auto;
-    border-radius:8px;
-    border:none;
-    font-size:16px;
-    background:#2a2a2a;
-    color:white;
-}
+    h2 {
+      text-align: center;
+      margin: 10px 0 25px;
+    }
 
-button {
-    width:100%;
-    padding:14px;
-    border-radius:10px;
-    border:none;
-    font-size:16px;
-    background:#4CAF50;
-    color:white;
-    cursor:pointer;
-}
+    .section,
+    .result-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
 
-.stunden-buttons {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:10px;
-}
+    .section-title {
+      display: block;
+      text-align: center;
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #bbb;
+    }
 
-.stunden-buttons button {
-    background:#2a2a2a;
-    border:1px solid #444;
-}
+    .hint {
+      margin: 8px 0 16px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #999;
+    }
 
-.stunden-buttons button.active {
-    background:#4CAF50;
-}
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
 
-.result-box {
-    margin-top:20px;
-    padding:20px;
-    background:#1e1e1e;
-    border-radius:12px;
-    line-height:1.6;
-}
+    button:active {
+      transform: translateY(1px);
+    }
 
-.countdown {
-    margin-top:15px;
-    font-size:20px;
-    text-align:center;
-    color:#4CAF50;
-}
+    .stunden-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
 
-.warn { color:#FFD54F; }
-.limit { color:#FF5252; }
+    .stunden-buttons button {
+      background: #2a2a2a;
+      border: 1px solid #444;
+    }
 
-</style>
+    .stunden-buttons button.active {
+      background: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .blocks-header,
+    .work-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr 38px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .blocks-header {
+      margin: 0 0 5px;
+      padding: 0 2px;
+      color: #aaa;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .work-block {
+      margin-bottom: 10px;
+    }
+
+    .work-block input {
+      width: 100%;
+      min-width: 0;
+      padding: 10px 8px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid #3b3b3b;
+      font-size: 16px;
+      background: #2a2a2a;
+      color: white;
+      color-scheme: dark;
+    }
+
+    .remove-block {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 50%;
+      background: #3a2525;
+      color: #ff8a80;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .remove-block:disabled {
+      visibility: hidden;
+      cursor: default;
+    }
+
+    .add-block {
+      margin: 4px 0 18px;
+      padding: 11px;
+      background: #2a2a2a;
+      border: 1px dashed #666;
+      color: #ddd;
+    }
+
+    .result-box {
+      line-height: 1.65;
+    }
+
+    .result-headline {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .block-summary {
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #272727;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .countdown {
+      margin-top: 15px;
+      font-size: 20px;
+      text-align: center;
+      color: #4CAF50;
+      line-height: 1.4;
+    }
+
+    .success {
+      color: #69db7c;
+    }
+
+    .warn {
+      color: #FFD54F;
+    }
+
+    .limit {
+      color: #FF6B6B;
+    }
+
+    .muted {
+      color: #aaa;
+    }
+
+    @media (max-width: 390px) {
+      .section,
+      .result-box {
+        padding: 16px;
+      }
+
+      .work-block input {
+        font-size: 15px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="container">
+    <h2>Arbeitszeitrechner</h2>
 
-<div class="container">
-<h2>Arbeitszeitrechner</h2>
+    <div class="section">
+      <span class="section-title">Wochenarbeitszeit</span>
 
-<div class="section">
+      <div class="stunden-buttons">
+        <button
+          type="button"
+          onclick="setWoche(40, this)"
+          class="active"
+        >
+          40 Std
+        </button>
 
-<label>Wochenarbeitszeit</label>
-<div class="stunden-buttons">
-<button type="button" onclick="setWoche(40,this)" class="active">40 Std</button>
-<button type="button" onclick="setWoche(39,this)">39 Std</button>
-<button type="button" onclick="setWoche(38,this)">38 Std</button>
-<button type="button" onclick="setWoche(37.5,this)">37.5 Std</button>
-</div>
+        <button
+          type="button"
+          onclick="setWoche(39, this)"
+        >
+          39 Std
+        </button>
 
-<label>Startzeit</label>
-<input type="time" id="startTime">
+        <button
+          type="button"
+          onclick="setWoche(38, this)"
+        >
+          38 Std
+        </button>
 
-<label>Tatsächlicher Feierabend (optional)</label>
-<input type="time" id="endTime">
+        <button
+          type="button"
+          onclick="setWoche(37.5, this)"
+        >
+          37,5 Std
+        </button>
+      </div>
 
-<button onclick="berechnen()">Berechnen</button>
-</div>
+      <span class="section-title">Arbeitsblöcke</span>
 
-<div id="output" class="result-box">
-Hier erscheint dein Ergebnis
-</div>
+      <p class="hint">
+        Trage jeden Arbeitsabschnitt einzeln ein.
+        Beim aktuell laufenden Block kann die Endzeit leer bleiben.
+      </p>
 
-<div id="countdown" class="countdown"></div>
-</div>
+      <div class="blocks-header" aria-hidden="true">
+        <span>Beginn</span>
+        <span>Ende</span>
+        <span></span>
+      </div>
 
-<script>
+      <div id="workBlocks"></div>
 
-let wochenStunden = 40;
-let countdownInterval;
+      <button
+        type="button"
+        class="add-block"
+        onclick="addWorkBlock()"
+      >
+        ＋ Weiteren Arbeitsblock hinzufügen
+      </button>
 
-function setWoche(stunden, el){
-    wochenStunden = stunden;
-    document.querySelectorAll(".stunden-buttons button")
-        .forEach(b=>b.classList.remove("active"));
-    el.classList.add("active");
-}
+      <button
+        type="button"
+        onclick="berechnen()"
+      >
+        Berechnen
+      </button>
+    </div>
 
-function formatTime(d){
-    return d.getHours().toString().padStart(2,"0")+":"+
-           d.getMinutes().toString().padStart(2,"0");
-}
+    <div id="output" class="result-box">
+      Hier erscheint dein Ergebnis
+    </div>
 
-function pauseNachGesetz(nettoMin){
-    if(nettoMin > 9*60) return 45;
-    if(nettoMin > 6*60) return 30;
-    return 0;
-}
+    <div id="countdown" class="countdown"></div>
+  </div>
 
-function startCountdown(target){
-    clearInterval(countdownInterval);
-    countdownInterval = setInterval(()=>{
-        let diff = target - new Date();
-        if(diff <= 0){
-            document.getElementById("countdown").textContent="Feierabend 🎉";
-            clearInterval(countdownInterval);
-            return;
+  <script>
+    let wochenStunden = 40;
+    let countdownInterval;
+
+    function setWoche(stunden, element) {
+      wochenStunden = stunden;
+
+      document
+        .querySelectorAll(".stunden-buttons button")
+        .forEach((button) => {
+          button.classList.remove("active");
+        });
+
+      element.classList.add("active");
+    }
+
+    function addWorkBlock(start = "", end = "") {
+      const container = document.getElementById("workBlocks");
+      const row = document.createElement("div");
+
+      row.className = "work-block";
+
+      row.innerHTML = `
+        <input
+          type="time"
+          class="block-start"
+          aria-label="Beginn des Arbeitsblocks"
+          value="${start}"
+        >
+
+        <input
+          type="time"
+          class="block-end"
+          aria-label="Ende des Arbeitsblocks"
+          value="${end}"
+        >
+
+        <button
+          type="button"
+          class="remove-block"
+          aria-label="Arbeitsblock entfernen"
+          onclick="removeWorkBlock(this)"
+        >
+          ×
+        </button>
+      `;
+
+      container.appendChild(row);
+      updateRemoveButtons();
+    }
+
+    function removeWorkBlock(button) {
+      button.closest(".work-block").remove();
+      updateRemoveButtons();
+    }
+
+    function updateRemoveButtons() {
+      const rows = document.querySelectorAll(".work-block");
+
+      rows.forEach((row) => {
+        row.querySelector(".remove-block").disabled =
+          rows.length === 1;
+      });
+    }
+
+    function timeToMinutes(value) {
+      const [hours, minutes] = value
+        .split(":")
+        .map(Number);
+
+      return hours * 60 + minutes;
+    }
+
+    function minutesToTime(totalMinutes) {
+      const normalized =
+        ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
+
+      const hours = Math.floor(normalized / 60);
+      const minutes = normalized % 60;
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    }
+
+    function formatDuration(totalMinutes) {
+      const rounded = Math.round(Math.abs(totalMinutes));
+      const hours = Math.floor(rounded / 60);
+      const minutes = rounded % 60;
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    }
+
+    function pauseNachGesetz(nettoMinuten) {
+      if (nettoMinuten > 9 * 60) {
+        return 45;
+      }
+
+      if (nettoMinuten > 6 * 60) {
+        return 30;
+      }
+
+      return 0;
+    }
+
+    function readWorkBlocks() {
+      const rows = [
+        ...document.querySelectorAll(".work-block")
+      ];
+
+      const blocks = [];
+
+      for (let index = 0; index < rows.length; index++) {
+        const startValue = rows[index]
+          .querySelector(".block-start")
+          .value;
+
+        const endValue = rows[index]
+          .querySelector(".block-end")
+          .value;
+
+        // Komplett leere Zeilen ignorieren
+        if (!startValue && !endValue) {
+          continue;
         }
-        let h=Math.floor(diff/1000/60/60);
-        let m=Math.floor(diff/1000/60)%60;
-        let s=Math.floor(diff/1000)%60;
-        document.getElementById("countdown").textContent=
-        `Countdown bis Soll-Feierabend: ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-    },1000);
-}
 
-function berechnen(){
+        // Endzeit ohne Anfangszeit ist nicht möglich
+        if (!startValue && endValue) {
+          throw new Error(
+            `Beim Arbeitsblock ${index + 1} fehlt die Anfangszeit.`
+          );
+        }
 
-let startInput=document.getElementById("startTime").value;
-let endInput=document.getElementById("endTime").value;
+        const start = timeToMinutes(startValue);
 
-if(!startInput){ alert("Bitte Startzeit eingeben"); return; }
+        const end = endValue
+          ? timeToMinutes(endValue)
+          : null;
 
-let [sh,sm]=startInput.split(":").map(Number);
-let start=new Date();
-start.setHours(sh,sm,0);
+        if (end !== null && end <= start) {
+          throw new Error(
+            `Beim Arbeitsblock ${index + 1} muss die Endzeit nach der Anfangszeit liegen.`
+          );
+        }
 
-let sollNettoMin=(wochenStunden/5)*60;
-let sollPause=pauseNachGesetz(sollNettoMin);
-let sollEnde=new Date(start.getTime()+(sollNettoMin+sollPause)*60000);
+        blocks.push({
+          number: index + 1,
+          startValue,
+          endValue,
+          start,
+          end
+        });
+      }
 
-let plus15=new Date(sollEnde.getTime()+15*60000);
+      if (blocks.length === 0) {
+        throw new Error(
+          "Bitte mindestens eine Anfangszeit eingeben."
+        );
+      }
 
-// 10h Netto Grenze
-let pause10=pauseNachGesetz(10*60);
-let zehnGrenze=new Date(start.getTime()+(10*60+pause10)*60000);
+      const openBlocks = blocks.filter(
+        (block) => block.end === null
+      );
 
-let output=`
-Du hast um ${startInput} begonnen.<br><br>
-Soll-Feierabend: <b>${formatTime(sollEnde)}</b><br>
-+15 Minuten: ${formatTime(plus15)}<br>
-<span class="limit">10 Stunden Netto erreicht um:</span> ${formatTime(zehnGrenze)}<br><br>
-`;
+      if (openBlocks.length > 1) {
+        throw new Error(
+          "Es darf nur ein aktuell laufender Arbeitsblock ohne Endzeit vorhanden sein."
+        );
+      }
 
-if(endInput){
+      if (
+        openBlocks.length === 1 &&
+        blocks[blocks.length - 1].end !== null
+      ) {
+        throw new Error(
+          "Nur der letzte Arbeitsblock darf ohne Endzeit bleiben."
+        );
+      }
 
-let [eh,em]=endInput.split(":").map(Number);
-let end=new Date();
-end.setHours(eh,em,0);
+      for (let index = 1; index < blocks.length; index++) {
+        const previous = blocks[index - 1];
+        const current = blocks[index];
 
-let bruttoMin=Math.round((end-start)/60000);
-let pause=pauseNachGesetz(bruttoMin);
-let nettoMin=bruttoMin-pause;
+        if (previous.end === null) {
+          throw new Error(
+            "Nach einem laufenden Arbeitsblock kann kein weiterer Block folgen."
+          );
+        }
 
-if(pause>0){
-output+=`<span class="warn">⚠ ${pause} Minuten Pause wurden automatisch abgezogen.</span><br><br>`;
-}
+        if (current.start < previous.end) {
+          throw new Error(
+            `Arbeitsblock ${current.number} überschneidet sich mit dem vorherigen Block.`
+          );
+        }
+      }
 
-let diff=nettoMin-sollNettoMin;
-let dh=Math.floor(Math.abs(diff)/60);
-let dm=Math.abs(diff)%60;
-let diffText=String(dh).padStart(2,"0")+":"+String(dm).padStart(2,"0");
+      return blocks;
+    }
 
-output+=`
-Tatsächlicher Feierabend: ${endInput}<br>
-Netto-Arbeitszeit: ${Math.floor(nettoMin/60)}h ${nettoMin%60}min<br><br>
-`;
+    function calculateTotals(blocks) {
+      let workedMinutes = 0;
+      let breakMinutes = 0;
 
-if(diff>0) output+=`Überstunden: +${diffText}`;
-else if(diff<0) output+=`Minusstunden: -${diffText}`;
-else output+=`Perfekt auf Sollzeit 🎯`;
+      blocks.forEach((block, index) => {
+        if (block.end !== null) {
+          workedMinutes += block.end - block.start;
+        }
 
-}
+        if (index > 0) {
+          const previous = blocks[index - 1];
 
-document.getElementById("output").innerHTML=output;
-startCountdown(sollEnde);
+          if (previous.end !== null) {
+            breakMinutes += block.start - previous.end;
+          }
+        }
+      });
 
-}
+      return {
+        workedMinutes,
+        breakMinutes
+      };
+    }
 
-if('serviceWorker' in navigator){
-navigator.serviceWorker.register('service-worker.js');
-}
+    function createBlockSummary(blocks) {
+      return blocks
+        .map((block, index) => {
+          const end = block.endValue || "läuft";
 
-</script>
+          const duration =
+            block.end === null
+              ? ""
+              : ` <span class="muted">(${formatDuration(
+                  block.end - block.start
+                )} Std.)</span>`;
 
+          return `
+            ${index + 1}. ${block.startValue}–${end}${duration}
+          `;
+        })
+        .join("<br>");
+    }
+
+    function startCountdown(targetMinutes) {
+      clearInterval(countdownInterval);
+
+      const update = () => {
+        const now = new Date();
+        const target = new Date();
+
+        target.setHours(
+          Math.floor(targetMinutes / 60),
+          targetMinutes % 60,
+          0,
+          0
+        );
+
+        if (target <= now) {
+          document.getElementById("countdown").textContent =
+            "Soll-Feierabend erreicht";
+
+          clearInterval(countdownInterval);
+          return;
+        }
+
+        const diff = target - now;
+
+        const hours = Math.floor(
+          diff / 1000 / 60 / 60
+        );
+
+        const minutes =
+          Math.floor(diff / 1000 / 60) % 60;
+
+        const seconds =
+          Math.floor(diff / 1000) % 60;
+
+        document.getElementById("countdown").textContent =
+          `Countdown bis Soll-Feierabend: ` +
+          `${String(hours).padStart(2, "0")}:` +
+          `${String(minutes).padStart(2, "0")}:` +
+          `${String(seconds).padStart(2, "0")}`;
+      };
+
+      update();
+
+      countdownInterval = setInterval(
+        update,
+        1000
+      );
+    }
+
+    function stopCountdown() {
+      clearInterval(countdownInterval);
+
+      document.getElementById("countdown").textContent =
+        "";
+    }
+
+    function berechnen() {
+      let blocks;
+
+      try {
+        blocks = readWorkBlocks();
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
+
+      const sollNettoMin =
+        (wochenStunden / 5) * 60;
+
+      const requiredBreak =
+        pauseNachGesetz(sollNettoMin);
+
+      const totals =
+        calculateTotals(blocks);
+
+      const currentBlock =
+        blocks[blocks.length - 1].end === null
+          ? blocks[blocks.length - 1]
+          : null;
+
+      let automaticBreakApplied = 0;
+
+      /*
+       * Bei einem einzelnen abgeschlossenen Zeitraum
+       * wird die gesetzliche Pause weiterhin automatisch
+       * abgezogen.
+       *
+       * Bei mehreren Arbeitsblöcken gelten die zeitlichen
+       * Lücken zwischen den Blöcken als erfasste Pause.
+       */
+      if (!currentBlock && blocks.length === 1) {
+        automaticBreakApplied =
+          pauseNachGesetz(totals.workedMinutes);
+
+        totals.workedMinutes -=
+          automaticBreakApplied;
+
+        totals.breakMinutes =
+          automaticBreakApplied;
+      }
+
+      let output = `
+        <div class="result-headline">
+          Deine Arbeitszeit
+        </div>
+
+        <div class="block-summary">
+          ${createBlockSummary(blocks)}
+        </div>
+      `;
+
+      /*
+       * Der letzte Block läuft noch.
+       * Die App berechnet den notwendigen Feierabend.
+       */
+      if (currentBlock) {
+        const remainingWork = Math.max(
+          0,
+          sollNettoMin - totals.workedMinutes
+        );
+
+        const remainingBreak = Math.max(
+          0,
+          requiredBreak - totals.breakMinutes
+        );
+
+        const sollEnde =
+          currentBlock.start +
+          remainingWork +
+          remainingBreak;
+
+        const plus15 =
+          sollEnde + 15;
+
+        const tenHourBreak =
+          pauseNachGesetz(10 * 60);
+
+        const remainingToTenHours = Math.max(
+          0,
+          10 * 60 - totals.workedMinutes
+        );
+
+        const remainingBreakToTen = Math.max(
+          0,
+          tenHourBreak - totals.breakMinutes
+        );
+
+        const zehnStundenGrenze =
+          currentBlock.start +
+          remainingToTenHours +
+          remainingBreakToTen;
+
+        output += `
+          Bereits gearbeitet:
+          <b>${formatDuration(totals.workedMinutes)} Std.</b>
+          <br>
+
+          Bereits erfasste Unterbrechung:
+          ${formatDuration(totals.breakMinutes)} Std.
+          <br><br>
+
+          Noch zu arbeiten:
+          <b>${formatDuration(remainingWork)} Std.</b>
+          <br>
+        `;
+
+        if (remainingBreak > 0) {
+          output += `
+            <span class="warn">
+              Zusätzlich noch erforderliche Pause:
+              ${remainingBreak} Minuten
+            </span>
+            <br><br>
+          `;
+        }
+
+        output += `
+          Soll-Feierabend:
+          <b class="success">
+            ${minutesToTime(sollEnde)}
+          </b>
+          <br>
+
+          +15 Minuten:
+          ${minutesToTime(plus15)}
+          <br>
+
+          <span class="limit">
+            10 Stunden Netto erreicht um:
+          </span>
+
+          ${minutesToTime(zehnStundenGrenze)}
+        `;
+
+        startCountdown(sollEnde);
+      }
+
+      /*
+       * Alle Arbeitsblöcke wurden abgeschlossen.
+       * Die App berechnet Über- oder Minusstunden.
+       */
+      else {
+        stopCountdown();
+
+        const diff =
+          totals.workedMinutes - sollNettoMin;
+
+        const actualRequiredBreak =
+          pauseNachGesetz(totals.workedMinutes);
+
+        output += `
+          Netto-Arbeitszeit:
+          <b>${formatDuration(totals.workedMinutes)} Std.</b>
+          <br>
+
+          ${
+            automaticBreakApplied > 0
+              ? `
+                Automatisch berücksichtigte Pause:
+                ${formatDuration(automaticBreakApplied)} Std.
+                <br>
+              `
+              : `
+                Erfasste Unterbrechungen:
+                ${formatDuration(totals.breakMinutes)} Std.
+                <br>
+              `
+          }
+
+          Tagessoll:
+          ${formatDuration(sollNettoMin)} Std.
+          <br><br>
+        `;
+
+        if (automaticBreakApplied > 0) {
+          output += `
+            <span class="warn">
+              ⚠ ${automaticBreakApplied} Minuten Pause
+              wurden automatisch abgezogen.
+            </span>
+            <br><br>
+          `;
+        } else if (
+          actualRequiredBreak > totals.breakMinutes
+        ) {
+          output += `
+            <span class="warn">
+              ⚠ Es sind nur ${totals.breakMinutes} Minuten
+              Unterbrechung erfasst. Bei dieser Arbeitszeit
+              wären mindestens ${actualRequiredBreak} Minuten
+              Pause erforderlich.
+            </span>
+            <br><br>
+          `;
+        }
+
+        if (diff > 0) {
+          output += `
+            <span class="success">
+              Überstunden:
+              +${formatDuration(diff)} Std.
+            </span>
+          `;
+        } else if (diff < 0) {
+          output += `
+            <span class="warn">
+              Minusstunden:
+              -${formatDuration(diff)} Std.
+            </span>
+          `;
+        } else {
+          output += `
+            <span class="success">
+              Perfekt auf Sollzeit
+            </span>
+          `;
+        }
+
+        if (totals.workedMinutes > 10 * 60) {
+          output += `
+            <br><br>
+
+            <span class="limit">
+              ⚠ Die tägliche Netto-Arbeitszeit liegt
+              über 10 Stunden.
+            </span>
+          `;
+        }
+      }
+
+      document.getElementById("output").innerHTML =
+        output;
+    }
+
+    /*
+     * Beim Öffnen der App wird direkt
+     * der erste Arbeitsblock angezeigt.
+     */
+    addWorkBlock();
+
+    /*
+     * PWA-Service-Worker registrieren.
+     */
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register(
+        "service-worker.js"
+      );
+    }
+  </script>
 </body>
 </html>
