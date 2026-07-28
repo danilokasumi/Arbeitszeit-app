@@ -14,9 +14,7 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       display: flex;
@@ -75,9 +73,7 @@
       cursor: pointer;
     }
 
-    button:active {
-      transform: translateY(1px);
-    }
+    button:active { transform: translateY(1px); }
 
     .stunden-buttons {
       display: grid;
@@ -180,35 +176,19 @@
       line-height: 1.4;
     }
 
-    .success {
-      color: #69db7c;
-    }
-
-    .warn {
-      color: #FFD54F;
-    }
-
-    .limit {
-      color: #FF6B6B;
-    }
-
-    .muted {
-      color: #aaa;
-    }
+    .success { color: #69db7c; }
+    .warn { color: #FFD54F; }
+    .limit { color: #FF6B6B; }
+    .muted { color: #aaa; }
 
     @media (max-width: 390px) {
       .section,
-      .result-box {
-        padding: 16px;
-      }
+      .result-box { padding: 16px; }
 
-      .work-block input {
-        font-size: 15px;
-      }
+      .work-block input { font-size: 15px; }
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h2>Arbeitszeitrechner</h2>
@@ -217,71 +197,30 @@
       <span class="section-title">Wochenarbeitszeit</span>
 
       <div class="stunden-buttons">
-        <button
-          type="button"
-          onclick="setWoche(40, this)"
-          class="active"
-        >
-          40 Std
-        </button>
-
-        <button
-          type="button"
-          onclick="setWoche(39, this)"
-        >
-          39 Std
-        </button>
-
-        <button
-          type="button"
-          onclick="setWoche(38, this)"
-        >
-          38 Std
-        </button>
-
-        <button
-          type="button"
-          onclick="setWoche(37.5, this)"
-        >
-          37,5 Std
-        </button>
+        <button type="button" onclick="setWoche(40, this)" class="active">40 Std</button>
+        <button type="button" onclick="setWoche(39, this)">39 Std</button>
+        <button type="button" onclick="setWoche(38, this)">38 Std</button>
+        <button type="button" onclick="setWoche(37.5, this)">37,5 Std</button>
       </div>
 
       <span class="section-title">Arbeitsblöcke</span>
-
       <p class="hint">
-        Trage jeden Arbeitsabschnitt einzeln ein.
-        Beim aktuell laufenden Block kann die Endzeit leer bleiben.
+        Trage jeden Arbeitsabschnitt einzeln ein. Beim aktuell laufenden Block kann die Endzeit leer bleiben.
       </p>
 
       <div class="blocks-header" aria-hidden="true">
         <span>Beginn</span>
-        <span>Ende</span>
+        <span>Ende (optional)</span>
         <span></span>
       </div>
 
       <div id="workBlocks"></div>
 
-      <button
-        type="button"
-        class="add-block"
-        onclick="addWorkBlock()"
-      >
-        ＋ Weiteren Arbeitsblock hinzufügen
-      </button>
-
-      <button
-        type="button"
-        onclick="berechnen()"
-      >
-        Berechnen
-      </button>
+      <button type="button" class="add-block" onclick="addWorkBlock()">＋ Weiteren Arbeitsblock hinzufügen</button>
+      <button type="button" onclick="berechnen()">Berechnen</button>
     </div>
 
-    <div id="output" class="result-box">
-      Hier erscheint dein Ergebnis
-    </div>
-
+    <div id="output" class="result-box">Hier erscheint dein Ergebnis</div>
     <div id="countdown" class="countdown"></div>
   </div>
 
@@ -291,141 +230,80 @@
 
     function setWoche(stunden, element) {
       wochenStunden = stunden;
-
-      document
-        .querySelectorAll(".stunden-buttons button")
-        .forEach((button) => {
-          button.classList.remove("active");
-        });
-
-      element.classList.add("active");
+      document.querySelectorAll('.stunden-buttons button').forEach(button => {
+        button.classList.remove('active');
+      });
+      element.classList.add('active');
     }
 
-    function addWorkBlock(start = "", end = "") {
-      const container = document.getElementById("workBlocks");
-      const row = document.createElement("div");
-
-      row.className = "work-block";
-
+    function addWorkBlock(start = '', end = '') {
+      const container = document.getElementById('workBlocks');
+      const row = document.createElement('div');
+      row.className = 'work-block';
       row.innerHTML = `
-        <input
-          type="time"
-          class="block-start"
-          aria-label="Beginn des Arbeitsblocks"
-          value="${start}"
-        >
-
-        <input
-          type="time"
-          class="block-end"
-          aria-label="Ende des Arbeitsblocks"
-          value="${end}"
-        >
-
-        <button
-          type="button"
-          class="remove-block"
-          aria-label="Arbeitsblock entfernen"
-          onclick="removeWorkBlock(this)"
-        >
-          ×
-        </button>
+        <input type="time" class="block-start" aria-label="Beginn des Arbeitsblocks" value="${start}">
+        <input type="time" class="block-end" aria-label="Ende des Arbeitsblocks" value="${end}">
+        <button type="button" class="remove-block" aria-label="Arbeitsblock entfernen" onclick="removeWorkBlock(this)">×</button>
       `;
-
       container.appendChild(row);
       updateRemoveButtons();
     }
 
     function removeWorkBlock(button) {
-      button.closest(".work-block").remove();
+      button.closest('.work-block').remove();
       updateRemoveButtons();
     }
 
     function updateRemoveButtons() {
-      const rows = document.querySelectorAll(".work-block");
-
-      rows.forEach((row) => {
-        row.querySelector(".remove-block").disabled =
-          rows.length === 1;
+      const rows = document.querySelectorAll('.work-block');
+      rows.forEach(row => {
+        row.querySelector('.remove-block').disabled = rows.length === 1;
       });
     }
 
     function timeToMinutes(value) {
-      const [hours, minutes] = value
-        .split(":")
-        .map(Number);
-
+      const [hours, minutes] = value.split(':').map(Number);
       return hours * 60 + minutes;
     }
 
     function minutesToTime(totalMinutes) {
-      const normalized =
-        ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
-
+      const normalized = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
       const hours = Math.floor(normalized / 60);
       const minutes = normalized % 60;
-
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
     function formatDuration(totalMinutes) {
       const rounded = Math.round(Math.abs(totalMinutes));
       const hours = Math.floor(rounded / 60);
       const minutes = rounded % 60;
-
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
     function pauseNachGesetz(nettoMinuten) {
-      if (nettoMinuten > 9 * 60) {
-        return 45;
-      }
-
-      if (nettoMinuten > 6 * 60) {
-        return 30;
-      }
-
+      if (nettoMinuten > 9 * 60) return 45;
+      if (nettoMinuten > 6 * 60) return 30;
       return 0;
     }
 
     function readWorkBlocks() {
-      const rows = [
-        ...document.querySelectorAll(".work-block")
-      ];
-
+      const rows = [...document.querySelectorAll('.work-block')];
       const blocks = [];
 
       for (let index = 0; index < rows.length; index++) {
-        const startValue = rows[index]
-          .querySelector(".block-start")
-          .value;
+        const startValue = rows[index].querySelector('.block-start').value;
+        const endValue = rows[index].querySelector('.block-end').value;
 
-        const endValue = rows[index]
-          .querySelector(".block-end")
-          .value;
-
-        // Komplett leere Zeilen ignorieren
-        if (!startValue && !endValue) {
-          continue;
-        }
-
-        // Endzeit ohne Anfangszeit ist nicht möglich
+        if (!startValue && !endValue) continue;
         if (!startValue && endValue) {
-          throw new Error(
-            `Beim Arbeitsblock ${index + 1} fehlt die Anfangszeit.`
-          );
+          throw new Error(`Beim Arbeitsblock ${index + 1} fehlt die Anfangszeit.`);
         }
 
         const start = timeToMinutes(startValue);
-
-        const end = endValue
-          ? timeToMinutes(endValue)
-          : null;
+        const end = endValue ? timeToMinutes(endValue) : null;
 
         if (end !== null && end <= start) {
-          throw new Error(
-            `Beim Arbeitsblock ${index + 1} muss die Endzeit nach der Anfangszeit liegen.`
-          );
+          throw new Error(`Beim Arbeitsblock ${index + 1} muss die Endzeit nach der Anfangszeit liegen.`);
         }
 
         blocks.push({
@@ -438,28 +316,16 @@
       }
 
       if (blocks.length === 0) {
-        throw new Error(
-          "Bitte mindestens eine Anfangszeit eingeben."
-        );
+        throw new Error('Bitte mindestens eine Anfangszeit eingeben.');
       }
 
-      const openBlocks = blocks.filter(
-        (block) => block.end === null
-      );
-
+      const openBlocks = blocks.filter(block => block.end === null);
       if (openBlocks.length > 1) {
-        throw new Error(
-          "Es darf nur ein aktuell laufender Arbeitsblock ohne Endzeit vorhanden sein."
-        );
+        throw new Error('Es darf nur ein aktuell laufender Arbeitsblock ohne Endzeit vorhanden sein.');
       }
 
-      if (
-        openBlocks.length === 1 &&
-        blocks[blocks.length - 1].end !== null
-      ) {
-        throw new Error(
-          "Nur der letzte Arbeitsblock darf ohne Endzeit bleiben."
-        );
+      if (openBlocks.length === 1 && blocks[blocks.length - 1].end !== null) {
+        throw new Error('Nur der letzte Arbeitsblock darf ohne Endzeit bleiben.');
       }
 
       for (let index = 1; index < blocks.length; index++) {
@@ -467,15 +333,11 @@
         const current = blocks[index];
 
         if (previous.end === null) {
-          throw new Error(
-            "Nach einem laufenden Arbeitsblock kann kein weiterer Block folgen."
-          );
+          throw new Error('Nach einem laufenden Arbeitsblock kann kein weiterer Block folgen.');
         }
 
         if (current.start < previous.end) {
-          throw new Error(
-            `Arbeitsblock ${current.number} überschneidet sich mit dem vorherigen Block.`
-          );
+          throw new Error(`Arbeitsblock ${current.number} überschneidet sich mit dem vorherigen Block.`);
         }
       }
 
@@ -493,36 +355,60 @@
 
         if (index > 0) {
           const previous = blocks[index - 1];
-
           if (previous.end !== null) {
             breakMinutes += block.start - previous.end;
           }
         }
       });
 
-      return {
-        workedMinutes,
-        breakMinutes
-      };
+      return { workedMinutes, breakMinutes };
     }
 
     function createBlockSummary(blocks) {
-      return blocks
-        .map((block, index) => {
-          const end = block.endValue || "läuft";
+      return blocks.map((block, index) => {
+        const end = block.endValue || 'läuft';
+        const duration = block.end === null
+          ? ''
+          : ` <span class="muted">(${formatDuration(block.end - block.start)} Std.)</span>`;
+        return `${index + 1}. ${block.startValue}–${end}${duration}`;
+      }).join('<br>');
+    }
 
-          const duration =
-            block.end === null
-              ? ""
-              : ` <span class="muted">(${formatDuration(
-                  block.end - block.start
-                )} Std.)</span>`;
+    // Berechnet den gesetzlichen Zeitpunkt für ein Netto-Ziel.
+    // Bereits eingetragene Unterbrechungen werden berücksichtigt,
+    // mindestens jedoch die gesetzlich erforderliche Pause.
+    function calculateTargetTime(blocks, targetNetMinutes) {
+      const requiredBreak = pauseNachGesetz(targetNetMinutes);
+      const firstStart = blocks[0].start;
 
-          return `
-            ${index + 1}. ${block.startValue}–${end}${duration}
-          `;
-        })
-        .join("<br>");
+      let workedBeforeTarget = 0;
+      let breaksBeforeTarget = 0;
+
+      for (let index = 0; index < blocks.length; index++) {
+        const block = blocks[index];
+
+        // Ein offener Block bedeutet: Ab hier läuft die Arbeit weiter.
+        if (block.end === null) {
+          break;
+        }
+
+        const duration = block.end - block.start;
+
+        // Das Ziel wird innerhalb dieses Blocks erreicht.
+        // Nachfolgende Pausen dürfen dann nicht mehr mitgerechnet werden.
+        if (workedBeforeTarget + duration >= targetNetMinutes) {
+          break;
+        }
+
+        workedBeforeTarget += duration;
+
+        const nextBlock = blocks[index + 1];
+        if (nextBlock) {
+          breaksBeforeTarget += nextBlock.start - block.end;
+        }
+      }
+
+      return firstStart + targetNetMinutes + Math.max(requiredBreak, breaksBeforeTarget);
     }
 
     function startCountdown(targetMinutes) {
@@ -531,54 +417,30 @@
       const update = () => {
         const now = new Date();
         const target = new Date();
-
-        target.setHours(
-          Math.floor(targetMinutes / 60),
-          targetMinutes % 60,
-          0,
-          0
-        );
+        target.setHours(Math.floor(targetMinutes / 60), targetMinutes % 60, 0, 0);
 
         if (target <= now) {
-          document.getElementById("countdown").textContent =
-            "Soll-Feierabend erreicht";
-
+          document.getElementById('countdown').textContent = 'Soll-Feierabend erreicht';
           clearInterval(countdownInterval);
           return;
         }
 
         const diff = target - now;
+        const hours = Math.floor(diff / 1000 / 60 / 60);
+        const minutes = Math.floor(diff / 1000 / 60) % 60;
+        const seconds = Math.floor(diff / 1000) % 60;
 
-        const hours = Math.floor(
-          diff / 1000 / 60 / 60
-        );
-
-        const minutes =
-          Math.floor(diff / 1000 / 60) % 60;
-
-        const seconds =
-          Math.floor(diff / 1000) % 60;
-
-        document.getElementById("countdown").textContent =
-          `Countdown bis Soll-Feierabend: ` +
-          `${String(hours).padStart(2, "0")}:` +
-          `${String(minutes).padStart(2, "0")}:` +
-          `${String(seconds).padStart(2, "0")}`;
+        document.getElementById('countdown').textContent =
+          `Countdown bis Soll-Feierabend: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
       };
 
       update();
-
-      countdownInterval = setInterval(
-        update,
-        1000
-      );
+      countdownInterval = setInterval(update, 1000);
     }
 
     function stopCountdown() {
       clearInterval(countdownInterval);
-
-      document.getElementById("countdown").textContent =
-        "";
+      document.getElementById('countdown').textContent = '';
     }
 
     function berechnen() {
@@ -591,247 +453,126 @@
         return;
       }
 
-      const sollNettoMin =
-        (wochenStunden / 5) * 60;
-
-      const requiredBreak =
-        pauseNachGesetz(sollNettoMin);
-
-      const totals =
-        calculateTotals(blocks);
-
-      const currentBlock =
-        blocks[blocks.length - 1].end === null
-          ? blocks[blocks.length - 1]
-          : null;
+      const sollNettoMin = (wochenStunden / 5) * 60;
+      const totals = calculateTotals(blocks);
+      const currentBlock = blocks[blocks.length - 1].end === null
+        ? blocks[blocks.length - 1]
+        : null;
 
       let automaticBreakApplied = 0;
 
-      /*
-       * Bei einem einzelnen abgeschlossenen Zeitraum
-       * wird die gesetzliche Pause weiterhin automatisch
-       * abgezogen.
-       *
-       * Bei mehreren Arbeitsblöcken gelten die zeitlichen
-       * Lücken zwischen den Blöcken als erfasste Pause.
-       */
+      // Bei einem einzigen abgeschlossenen Zeitraum wird die gesetzliche
+      // Pause wie in der ursprünglichen App automatisch abgezogen.
+      // Bei mehreren Blöcken bilden die Lücken die tatsächlichen Pausen ab.
       if (!currentBlock && blocks.length === 1) {
-        automaticBreakApplied =
-          pauseNachGesetz(totals.workedMinutes);
-
-        totals.workedMinutes -=
-          automaticBreakApplied;
-
-        totals.breakMinutes =
-          automaticBreakApplied;
+        automaticBreakApplied = pauseNachGesetz(totals.workedMinutes);
+        totals.workedMinutes -= automaticBreakApplied;
+        totals.breakMinutes = automaticBreakApplied;
       }
 
-      let output = `
-        <div class="result-headline">
-          Deine Arbeitszeit
-        </div>
+      // Diese drei Werte werden IMMER berechnet und angezeigt – unabhängig
+      // davon, ob eine Endzeit eingetragen wurde.
+      const sollEnde = calculateTargetTime(blocks, sollNettoMin);
+      const plus15 = sollEnde + 15;
+      const zehnStundenGrenze = calculateTargetTime(blocks, 10 * 60);
 
-        <div class="block-summary">
-          ${createBlockSummary(blocks)}
-        </div>
+      let output = `
+        <div class="result-headline">Deine Arbeitszeit</div>
+        <div class="block-summary">${createBlockSummary(blocks)}</div>
+
+        Soll-Feierabend:
+        <b class="success">${minutesToTime(sollEnde)}</b><br>
+
+        +15 Minuten:
+        ${minutesToTime(plus15)}<br>
+
+        <span class="limit">Gesetzliche 10-Stunden-Netto-Grenze:</span>
+        <b class="limit">${minutesToTime(zehnStundenGrenze)}</b><br><br>
       `;
 
-      /*
-       * Der letzte Block läuft noch.
-       * Die App berechnet den notwendigen Feierabend.
-       */
       if (currentBlock) {
-        const remainingWork = Math.max(
-          0,
-          sollNettoMin - totals.workedMinutes
-        );
-
-        const remainingBreak = Math.max(
-          0,
-          requiredBreak - totals.breakMinutes
-        );
-
-        const sollEnde =
-          currentBlock.start +
-          remainingWork +
-          remainingBreak;
-
-        const plus15 =
-          sollEnde + 15;
-
-        const tenHourBreak =
-          pauseNachGesetz(10 * 60);
-
-        const remainingToTenHours = Math.max(
-          0,
-          10 * 60 - totals.workedMinutes
-        );
-
-        const remainingBreakToTen = Math.max(
-          0,
-          tenHourBreak - totals.breakMinutes
-        );
-
-        const zehnStundenGrenze =
-          currentBlock.start +
-          remainingToTenHours +
-          remainingBreakToTen;
+        const remainingWork = Math.max(0, sollNettoMin - totals.workedMinutes);
+        const requiredBreak = pauseNachGesetz(sollNettoMin);
+        const remainingBreak = Math.max(0, requiredBreak - totals.breakMinutes);
 
         output += `
           Bereits gearbeitet:
-          <b>${formatDuration(totals.workedMinutes)} Std.</b>
-          <br>
+          <b>${formatDuration(totals.workedMinutes)} Std.</b><br>
 
           Bereits erfasste Unterbrechung:
-          ${formatDuration(totals.breakMinutes)} Std.
-          <br><br>
+          ${formatDuration(totals.breakMinutes)} Std.<br><br>
 
           Noch zu arbeiten:
-          <b>${formatDuration(remainingWork)} Std.</b>
-          <br>
+          <b>${formatDuration(remainingWork)} Std.</b><br>
         `;
 
         if (remainingBreak > 0) {
           output += `
             <span class="warn">
-              Zusätzlich noch erforderliche Pause:
-              ${remainingBreak} Minuten
-            </span>
-            <br><br>
+              Zusätzlich noch erforderliche Pause: ${remainingBreak} Minuten
+            </span><br><br>
           `;
         }
-
-        output += `
-          Soll-Feierabend:
-          <b class="success">
-            ${minutesToTime(sollEnde)}
-          </b>
-          <br>
-
-          +15 Minuten:
-          ${minutesToTime(plus15)}
-          <br>
-
-          <span class="limit">
-            10 Stunden Netto erreicht um:
-          </span>
-
-          ${minutesToTime(zehnStundenGrenze)}
-        `;
-
-        startCountdown(sollEnde);
-      }
-
-      /*
-       * Alle Arbeitsblöcke wurden abgeschlossen.
-       * Die App berechnet Über- oder Minusstunden.
-       */
-      else {
-        stopCountdown();
-
-        const diff =
-          totals.workedMinutes - sollNettoMin;
-
-        const actualRequiredBreak =
-          pauseNachGesetz(totals.workedMinutes);
+      } else {
+        const diff = totals.workedMinutes - sollNettoMin;
+        const actualRequiredBreak = pauseNachGesetz(totals.workedMinutes);
 
         output += `
           Netto-Arbeitszeit:
-          <b>${formatDuration(totals.workedMinutes)} Std.</b>
-          <br>
+          <b>${formatDuration(totals.workedMinutes)} Std.</b><br>
 
-          ${
-            automaticBreakApplied > 0
-              ? `
-                Automatisch berücksichtigte Pause:
-                ${formatDuration(automaticBreakApplied)} Std.
-                <br>
-              `
-              : `
-                Erfasste Unterbrechungen:
-                ${formatDuration(totals.breakMinutes)} Std.
-                <br>
-              `
-          }
+          ${automaticBreakApplied > 0
+            ? `Automatisch berücksichtigte Pause: ${formatDuration(automaticBreakApplied)} Std.<br>`
+            : `Erfasste Unterbrechungen: ${formatDuration(totals.breakMinutes)} Std.<br>`}
 
           Tagessoll:
-          ${formatDuration(sollNettoMin)} Std.
-          <br><br>
+          ${formatDuration(sollNettoMin)} Std.<br><br>
         `;
 
         if (automaticBreakApplied > 0) {
           output += `
             <span class="warn">
-              ⚠ ${automaticBreakApplied} Minuten Pause
-              wurden automatisch abgezogen.
-            </span>
-            <br><br>
+              ⚠ ${automaticBreakApplied} Minuten Pause wurden automatisch abgezogen.
+            </span><br><br>
           `;
-        } else if (
-          actualRequiredBreak > totals.breakMinutes
-        ) {
+        } else if (actualRequiredBreak > totals.breakMinutes) {
           output += `
             <span class="warn">
-              ⚠ Es sind nur ${totals.breakMinutes} Minuten
-              Unterbrechung erfasst. Bei dieser Arbeitszeit
-              wären mindestens ${actualRequiredBreak} Minuten
-              Pause erforderlich.
-            </span>
-            <br><br>
+              ⚠ Es sind nur ${totals.breakMinutes} Minuten Unterbrechung erfasst.
+              Bei dieser Arbeitszeit wären mindestens ${actualRequiredBreak} Minuten Pause erforderlich.
+            </span><br><br>
           `;
         }
 
         if (diff > 0) {
-          output += `
-            <span class="success">
-              Überstunden:
-              +${formatDuration(diff)} Std.
-            </span>
-          `;
+          output += `<span class="success">Überstunden: +${formatDuration(diff)} Std.</span>`;
         } else if (diff < 0) {
-          output += `
-            <span class="warn">
-              Minusstunden:
-              -${formatDuration(diff)} Std.
-            </span>
-          `;
+          output += `<span class="warn">Minusstunden: -${formatDuration(diff)} Std.</span>`;
         } else {
-          output += `
-            <span class="success">
-              Perfekt auf Sollzeit
-            </span>
-          `;
+          output += '<span class="success">Perfekt auf Sollzeit</span>';
         }
 
         if (totals.workedMinutes > 10 * 60) {
           output += `
             <br><br>
-
             <span class="limit">
-              ⚠ Die tägliche Netto-Arbeitszeit liegt
-              über 10 Stunden.
+              ⚠ Die tägliche Netto-Arbeitszeit liegt über 10 Stunden.
             </span>
           `;
         }
       }
 
-      document.getElementById("output").innerHTML =
-        output;
+      document.getElementById('output').innerHTML = output;
+
+      // Wie in der ursprünglichen App läuft der Countdown auch dann,
+      // wenn keine Endzeit eingetragen wurde.
+      startCountdown(sollEnde);
     }
 
-    /*
-     * Beim Öffnen der App wird direkt
-     * der erste Arbeitsblock angezeigt.
-     */
     addWorkBlock();
 
-    /*
-     * PWA-Service-Worker registrieren.
-     */
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register(
-        "service-worker.js"
-      );
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
     }
   </script>
 </body>
