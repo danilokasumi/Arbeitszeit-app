@@ -344,24 +344,50 @@
       return blocks;
     }
 
+    function getCurrentMinutes() {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+
     function calculateTotals(blocks) {
       let workedMinutes = 0;
       let breakMinutes = 0;
+      let automaticBreakApplied = 0;
+      const currentMinutes = getCurrentMinutes();
 
       blocks.forEach((block, index) => {
-        if (block.end !== null) {
-          workedMinutes += block.end - block.start;
-        }
+        const effectiveEnd = block.end !== null
+          ? block.end
+          : currentMinutes;
+
+        workedMinutes += Math.max(0, effectiveEnd - block.start);
 
         if (index > 0) {
           const previous = blocks[index - 1];
+
           if (previous.end !== null) {
-            breakMinutes += block.start - previous.end;
+            breakMinutes += Math.max(0, block.start - previous.end);
           }
         }
       });
 
-      return { workedMinutes, breakMinutes };
+      /*
+       * Bei nur einem durchgehenden Arbeitsblock gibt es keine separat
+       * eingetragene Pause. Deshalb wird – wie in der ursprünglichen App –
+       * die gesetzliche Pause automatisch von der vergangenen Zeit abgezogen:
+       * über 6 Stunden = 30 Minuten, über 9 Stunden = 45 Minuten.
+       */
+      if (blocks.length === 1) {
+        automaticBreakApplied = pauseNachGesetz(workedMinutes);
+        workedMinutes = Math.max(0, workedMinutes - automaticBreakApplied);
+        breakMinutes = automaticBreakApplied;
+      }
+
+      return {
+        workedMinutes,
+        breakMinutes,
+        automaticBreakApplied
+      };
     }
 
     function createBlockSummary(blocks) {
@@ -459,16 +485,7 @@
         ? blocks[blocks.length - 1]
         : null;
 
-      let automaticBreakApplied = 0;
-
-      // Bei einem einzigen abgeschlossenen Zeitraum wird die gesetzliche
-      // Pause wie in der ursprünglichen App automatisch abgezogen.
-      // Bei mehreren Blöcken bilden die Lücken die tatsächlichen Pausen ab.
-      if (!currentBlock && blocks.length === 1) {
-        automaticBreakApplied = pauseNachGesetz(totals.workedMinutes);
-        totals.workedMinutes -= automaticBreakApplied;
-        totals.breakMinutes = automaticBreakApplied;
-      }
+      const automaticBreakApplied = totals.automaticBreakApplied;
 
       // Diese drei Werte werden IMMER berechnet und angezeigt – unabhängig
       // davon, ob eine Endzeit eingetragen wurde.
